@@ -1,0 +1,56 @@
+<!doctype html>
+  <head>
+    <title>Zendesk</title>
+  </head>
+
+  <body>
+    <div id="content">
+      <div id="left_pane">
+        
+      </div>
+
+      <div id="right_pane">
+        
+      </div>
+    </div>
+
+    <script src="javascripts/vendor/jquery-1.5.js"></script>
+    <script src="javascripts/vendor/underscore-1.1.4.js"></script>
+    <script src="javascripts/vendor/backbone-0.3.3.js"></script>
+    <script src="javascripts/vendor/handlebars-0.9.0.pre.4.js"></script>
+
+    <script id="user_details_template" type="text/x-handlebars-template">
+      This dude is called: {{name}}
+    </script>
+
+    <script id="user_list_template" type="text/x-handlebars-template">
+      <h1>Users</h1>
+      <ul>
+        {{#collection}}
+          {{#view "UserListItemView"}}
+            <a href="#users/{{id}}">{{name}}</a>
+          {{/view}}
+        {{/collection}}
+      </ul>
+    </script>
+
+    <script src="javascripts/sync.js"></script>
+
+    <script src="javascripts/models.js"></script>
+    <script src="javascripts/models/user.js"></script>
+
+    <script src="javascripts/views.js"></script>
+    <script src="javascripts/views/user_list_view.js"></script>
+    <script src="javascripts/views/user_details_view.js"></script>
+
+    <script src="javascripts/controllers/users_controller.js"></script>
+
+    <script type="text/javascript" charset="utf-8">
+      var usersController;
+      $(function() {
+        usersController = new UsersController();
+        Backbone.history.start();
+      });
+    </script>
+  </body>
+</html>

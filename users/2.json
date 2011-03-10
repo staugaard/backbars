@@ -1,0 +1,20 @@
+{
+  "name":"Morten Primdahl",
+  "created_at":"2011/03/08 09:57:42 -0800",
+  "last_login":"2011/03/09 14:04:37 -0800",
+  "details":null,
+  "updated_at":"2011/03/08 09:57:42 -0800",
+  "notes":null,
+  "is_verified":true,
+  "external_id":null,
+  "restriction_id":0,
+  "id":2,
+  "photo_url":"http://support.localhost:3000/images/types/user_sm.png",
+  "phone":null,
+  "is_active":true,
+  "email":"morten@zendesk.com",
+  "time_zone":"Pacific Time (US & Canada)",
+  "roles":2,
+  "organization_id":1,
+  "uses_12_hour_clock":false
+}
