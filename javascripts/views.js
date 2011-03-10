@@ -38,6 +38,8 @@ Backbone.HandlebarsView = Backbone.View.extend({
       this.model.bind('change', this.render);
     } else if (this.collection) {
       this.instance = this.collection;
+      this.collection.bind('add', this.render);
+      this.collection.bind('remove', this.render);
     };
 
     if (options.childViews) {
@@ -54,10 +56,17 @@ Backbone.HandlebarsView = Backbone.View.extend({
   },
 
   render: function() {
-    $(this.el).html(this.template(this.toHandlebarsViewObject()));
     if (this.isRootView) {
+      this.childViews = [];
+    }
+
+    $(this.el).html(this.template(this.toHandlebarsViewObject()));
+
+    if (this.isRootView) {
+      console.log('rendering ' + this.childViews.length + ' sub views');
       _.each(this.childViews, function(view) { view.render(); });
     };
+
     return this;
   }
 });
