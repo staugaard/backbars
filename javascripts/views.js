@@ -1,30 +1,73 @@
-Handlebars.registerHelper('view', function(viewName, block, a, b, c) {
+Handlebars.registerHelper('view', function(viewName, block) {
   var viewConstructor = eval(viewName);
   var view = new viewConstructor({
     model: this._model,
     collection: this._collection,
-    childViews: this._view.childViews,
     template: block
   });
 
   var id = _.uniqueId('bb_view');
   view.el = "#" + id;
 
-  this._view.childViews.push(view);
-
   var placeHolder = "<" + view.tagName + ' id="' + id + '"';
   if (view.className) {
     placeHolder = placeHolder + ' class="' + view.className + '"';
   };
-  placeHolder = placeHolder + "></" + view.tagName + ">";
+  placeHolder = placeHolder + ">";
+  placeHolder = placeHolder += view.render();
+  placeHolder = placeHolder + "</" + view.tagName + ">";
 
   return placeHolder;
+});
+
+Handlebars.registerHelper('collection_view', function(viewName, block) {
+  var collectionView = new Backbone.HandlebarsCollectionView({
+    childView: viewName,
+    collection: this._collection,
+    template: block
+  })
+
+  return _.map(this.collection, function(model) {
+    return Handlebars.helpers.view.apply(model, [viewName, block]);
+  }).join('');
 });
 
 var templates = {
   'user_details':   Handlebars.compile($("#user_details_template").html()),
   'user_list':      Handlebars.compile($("#user_list_template").html())
 }
+
+Backbone.HandlebarsCollectionView = Backbone.View.extend({
+  initialize: function(options) {
+    this.render = _.bind(this.render, this);
+
+    if (options.childView) {
+      this.childView = options.childView;
+    };
+    if (_.isString(this.childView)) {
+      this.childView = eval(this.childView);
+    };
+
+    this.template = options.template;
+
+    this.collection = options.collection;
+    this.collection.bind('add',    this.render);
+    this.collection.bind('remove', this.render);
+  },
+
+  render: function() {
+    var childView;
+
+    var content = _.map(this.collection, function(model) {
+      childView = new (this.childView)({ model: model, template: this.template });
+      return childView.render();
+    });
+
+    content = content.join('');
+    $(this.el).html(content);
+    return content;
+  }
+});
 
 Backbone.HandlebarsView = Backbone.View.extend({
   initialize : function(options) {
@@ -34,39 +77,17 @@ Backbone.HandlebarsView = Backbone.View.extend({
     this.render = _.bind(this.render, this);
  
     if (this.model) {
-      this.instance = this.model;
       this.model.bind('change', this.render);
-    } else if (this.collection) {
-      this.instance = this.collection;
-      this.collection.bind('add', this.render);
-      this.collection.bind('remove', this.render);
-    };
-
-    if (options.childViews) {
-      this.childViews = options.childViews;
-      this.isRootView = false;
-    } else {
-      this.childViews = [];
-      this.isRootView = true
     };
   },
 
   toHandlebarsViewObject: function() {
-    return this.instance.toHandlebarsViewObject(this);
+    return (this.model || this.collection).toHandlebarsViewObject();
   },
 
   render: function() {
-    if (this.isRootView) {
-      this.childViews = [];
-    }
-
-    $(this.el).html(this.template(this.toHandlebarsViewObject()));
-
-    if (this.isRootView) {
-      console.log('rendering ' + this.childViews.length + ' sub views');
-      _.each(this.childViews, function(view) { view.render(); });
-    };
-
-    return this;
+    var content = this.template(this.toHandlebarsViewObject());
+    $(this.el).html(content);
+    return content;
   }
 });

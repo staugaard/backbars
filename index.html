@@ -27,11 +27,9 @@
     <script id="user_list_template" type="text/x-handlebars-template">
       <h1>Users</h1>
       <ul>
-        {{#collection}}
-          {{#view "UserListItemView"}}
-            <a href="#users/{{id}}">{{name}}</a>
-          {{/view}}
-        {{/collection}}
+        {{#collection_view "UserListItemView"}}
+          <a href="#users/{{id}}">{{name}}</a>
+        {{/collection_view}}
       </ul>
     </script>
 
