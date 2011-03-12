@@ -24,9 +24,9 @@ Handlebars.registerHelper('view', function(viewName, block) {
   return view.renderToString();
 });
 
-Handlebars.registerHelper('collection_view', function(viewName, block) {
+Handlebars.registerHelper('collection_view', function(modelViewName, block) {
   var collectionView = new Backbone.HandlebarsCollectionView({
-    childView: eval(viewName),
+    modelView: eval(modelViewName),
     collection: this.collection,
     template: block
   })
@@ -46,6 +46,7 @@ Backbone.HandlebarsView = Backbone.View.extend({
     };
   },
 
+  //we no not want backbone to create an new wrapper element, as handlebars just deals with strings
   _ensureElement: function() {},
 
   prepareForBinding: function(options) {
@@ -85,7 +86,7 @@ Backbone.HandlebarsCollectionView = Backbone.HandlebarsView.extend({
     this.addModel    = _.bind(this.addModel, this);
     this.removeModel = _.bind(this.removeModel, this);
 
-    this.childView = options.childView || this.childView;
+    this.modelView = options.modelView || this.modelView;
     this.template = options.template;
 
     this.collection.bind('add',    this.addModel);
@@ -96,7 +97,7 @@ Backbone.HandlebarsCollectionView = Backbone.HandlebarsView.extend({
     var view;
     var id;
     var content = _.map(this.collection.models, function(model) {
-      view = new (this.childView)({ model: model, template: this.template });
+      view = new (this.modelView)({ model: model, template: this.template });
       return view.renderToString();
     }, this).join('');
     
@@ -105,11 +106,11 @@ Backbone.HandlebarsCollectionView = Backbone.HandlebarsView.extend({
   },
 
   addModel: function(model) {
-    view = new (this.childView)({ model: model, template: this.template });
+    view = new (this.modelView)({ model: model, template: this.template });
     $(this.el).append(view.renderToString());
   },
 
   removeModel: function(model) {
-    $('[data-cid=' + model.cid + ']').remove();
+    $('[data-cid=' + model.cid + ']').unbind().remove();
   }
 });
