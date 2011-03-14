@@ -108,12 +108,19 @@ Backbone.HandlebarsCollectionView = Backbone.HandlebarsView.extend({
     this.collection.bind('remove', this.removeModel);
   },
 
+  _newModelView: function(model) {
+    return new (this.modelView)({
+      model: model,
+      template: this.template,
+      tagName: this.modelTagName
+    });
+  },
+
   render: function() {
     var view;
     var id;
     var content = _.map(this.collection.models, function(model) {
-      view = new (this.modelView)({ model: model, template: this.template, tagName: this.modelTagName });
-      return view.renderToString();
+      return this._newModelView(model).renderToString();
     }, this).join('');
 
     $(this.el).html(content);
@@ -121,8 +128,7 @@ Backbone.HandlebarsCollectionView = Backbone.HandlebarsView.extend({
   },
 
   addModel: function(model) {
-    view = new (this.modelView)({ model: model, template: this.template, tagName: this.modelTagName });
-    $(this.el).append(view.renderToString());
+    $(this.el).append(this._newModelView(model).renderToString());
   },
 
   removeModel: function(model) {
