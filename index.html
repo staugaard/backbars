@@ -27,7 +27,7 @@
     <script id="user_list_template" type="text/x-handlebars-template">
       <h1>Users</h1>
       <ul>
-        {{#collection_view "UserListItemView"}}
+        {{#collection_view}}
           <a href="#users/{{id}}">{{name}}</a>
         {{/collection_view}}
       </ul>
@@ -38,8 +38,6 @@
     <script src="javascripts/models/user.js"></script>
 
     <script src="javascripts/views.js"></script>
-    <script src="javascripts/views/user_list_view.js"></script>
-    <script src="javascripts/views/user_details_view.js"></script>
 
     <script src="javascripts/controllers/users_controller.js"></script>
 

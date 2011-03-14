@@ -25,6 +25,11 @@ Handlebars.registerHelper('view', function(viewName, block) {
 });
 
 Handlebars.registerHelper('collection_view', function(modelViewName, block) {
+  if (_.isFunction(modelViewName)) {
+    block = modelViewName;
+    modelViewName = 'Backbone.HandlebarsView';
+  };
+
   var collectionView = new Backbone.HandlebarsCollectionView({
     modelView: eval(modelViewName),
     collection: this.collection,
@@ -80,6 +85,15 @@ Backbone.HandlebarsView = Backbone.View.extend({
   }
 });
 
+$.fn.render = function(templateName, context) {
+  var viewArgs = _.extend(context, {
+    template: templateName,
+    el: this
+  });
+
+  (new Backbone.HandlebarsView(viewArgs)).render();
+}
+
 Backbone.HandlebarsCollectionView = Backbone.HandlebarsView.extend({
   initialize: function(options) {
     this.prepareForBinding(options);
@@ -87,6 +101,7 @@ Backbone.HandlebarsCollectionView = Backbone.HandlebarsView.extend({
     this.removeModel = _.bind(this.removeModel, this);
 
     this.modelView = options.modelView || this.modelView;
+    this.modelTagName = options.modelTagName || 'li',
     this.template = options.template;
 
     this.collection.bind('add',    this.addModel);
@@ -97,16 +112,16 @@ Backbone.HandlebarsCollectionView = Backbone.HandlebarsView.extend({
     var view;
     var id;
     var content = _.map(this.collection.models, function(model) {
-      view = new (this.modelView)({ model: model, template: this.template });
+      view = new (this.modelView)({ model: model, template: this.template, tagName: this.modelTagName });
       return view.renderToString();
     }, this).join('');
-    
+
     $(this.el).html(content);
     return content;
   },
 
   addModel: function(model) {
-    view = new (this.modelView)({ model: model, template: this.template });
+    view = new (this.modelView)({ model: model, template: this.template, tagName: this.modelTagName });
     $(this.el).append(view.renderToString());
   },
 

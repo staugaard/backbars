@@ -10,15 +10,13 @@ var UsersController = Backbone.Controller.extend({
 
     this.users.fetch({
       success: function(collection) {
-        var view = new UserListView({collection: collection});
-        view.render();
+        $('#left_pane').render('user_list', {collection: collection});
       }
     });
   },
 
   _showUser: function(user) {
-    var view = new UserDetailsView({model: user});
-    view.render();
+    $('#right_pane').render('user_details', {model: user});
   },
 
   show: function(id) {
