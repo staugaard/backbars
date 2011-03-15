@@ -6,25 +6,21 @@ var UsersController = Backbone.Controller.extend({
   },
 
   index: function() {
-    this.users = new UserCollection();
-
-    this.users.fetch({
-      success: function(collection) {
-        $('#left_pane').render('user_list', {collection: collection});
-      }
-    });
-  },
-
-  _showUser: function(user) {
-    $('#right_pane').render('user_details', {model: user});
+    this.collection = new UserCollection();
+    $('#left_pane').render('user_list', this);
+    this.collection.fetch();
   },
 
   show: function(id) {
-    var user;
-    if (this.users && (user = this.users.get(id))) {
-      this._showUser(user);
-    } else {
-      (new User({id: id})).fetch({ success: this._showUser })
+    if (this.collection) {
+      this.model = this.collection.get(id)
     };
+
+    if (!this.model) {
+      this.model = new User({id: id});
+    };
+
+    $('#right_pane').render('user_details', this);
+    this.model.fetch();
   }
 });

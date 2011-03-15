@@ -99,8 +99,9 @@ Backbone.HandlebarsCollectionView = Backbone.HandlebarsView.extend({
     this.modelTagName = options.modelTagName || 'li',
     this.template = options.template;
 
-    this.collection.bind('add',    this.addModel);
-    this.collection.bind('remove', this.removeModel);
+    this.collection.bind('refresh', this.render);
+    this.collection.bind('add',     this.addModel);
+    this.collection.bind('remove',  this.removeModel);
   },
 
   _newModelView: function(model) {
