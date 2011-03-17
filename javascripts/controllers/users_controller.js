@@ -1,3 +1,8 @@
+Backbone.Context = Backbone.Model.extend({
+  initialize: function(attributes, options) {
+  }
+})
+
 var UsersController = Backbone.Controller.extend({
   routes: {
     "":          "index",
@@ -5,22 +10,23 @@ var UsersController = Backbone.Controller.extend({
     "users/:id": "show"
   },
 
+  initialize: function(options) {
+    this.context = new Backbone.Context();
+    this.context.set({ users: new UserCollection() });
+  },
+
   index: function() {
-    this.collection = new UserCollection();
-    $('#left_pane').render('user_list', this);
-    this.collection.fetch();
+    this.context.get('users').fetch();
   },
 
   show: function(id) {
-    if (this.collection) {
-      this.model = this.collection.get(id)
+    var self = this;
+    var collection = this.context.get('users');
+    var user = collection.get(id);
+    if (!user) {
+      user = new User({ id: id });
+      user.fetch();
     };
-
-    if (!this.model) {
-      this.model = new User({id: id});
-    };
-
-    $('#right_pane').render('user_details', this);
-    this.model.fetch();
+    this.context.set({user: user});
   }
 });

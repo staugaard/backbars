@@ -17,20 +17,41 @@
     <script src="javascripts/vendor/jquery-1.5.js"></script>
     <script src="javascripts/vendor/underscore-1.1.4.js"></script>
     <script src="javascripts/vendor/backbone-0.3.3.js"></script>
-    <script src="javascripts/vendor/handlebars-0.9.0.pre.4.js"></script>
+    <script src="javascripts/vendor/handlebars.js"></script>
     <script src="javascripts/vendor/backbars.js"></script>
 
-    <script id="user_details_template" type="text/x-handlebars-template">
-      <p>Name: {{name}}</p>
-      <p>Mail: {{email}}</p>
+    <script id="user_details" type="text/x-handlebars-template">
+      {{#view binding=user}}
+        <p>Name: {{user.name}}</p>
+        <p>Mail: {{user.email}}</p>
+      {{/view}}
     </script>
 
-    <script id="user_list_template" type="text/x-handlebars-template">
+    <!--
+    
+
+    {{#collection users itemView="Zendesk.UsersView"}}
+      This user is named {{#bind name}}
+
+      {{#view "MyView" binding="name"}}
+        blabla {{name}}
+      {{/view}}
+
+      <a href="#users/{{id}}">{{name}}</a>
+    {{/collection}}
+
+    -->
+
+    <script id="user_list" type="text/x-handlebars-template">
       <h1>Users</h1>
       <ul>
-        {{#collection_view}}
+        <!--
+          itemView    defaults to Backbone.HandlebarsView
+          itemTagName defaults to li
+        -->
+        {{#collection users}}
           <a href="#users/{{id}}">{{name}}</a>
-        {{/collection_view}}
+        {{/collection}}
       </ul>
     </script>
 
@@ -38,14 +59,35 @@
 
     <script src="javascripts/models/user.js"></script>
 
-    <script src="javascripts/views.js"></script>
-
     <script src="javascripts/controllers/users_controller.js"></script>
 
     <script type="text/javascript" charset="utf-8">
       var usersController;
+      var usersCollectionView;
+      var userDetailsView;
+      var templates = {};
+
       $(function() {
+        _.each($("script[type='text/x-handlebars-template']"), function(template) {
+          templates[template.id] = Handlebars.compile($(template).html());
+        });
+
         usersController = new UsersController();
+
+        usersCollectionView = new Backbone.HandlebarsView({
+          el: '#left_pane',
+          template: 'user_list',
+          context: usersController.context
+        });
+        usersCollectionView.render();
+
+        userDetailsView = new Backbone.HandlebarsView({
+          el: '#right_pane',
+          template: 'user_details',
+          context: usersController.context
+        });
+        usersController.context.bind('change:user', userDetailsView.render);
+
         Backbone.history.start();
       });
     </script>
